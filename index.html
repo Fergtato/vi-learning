@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Visual Learning</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+</body>
+
+<script>
+    var io = io.connect();
+
+    io.on('connect', function() {
+        if (window.location.href.indexOf('?id=') > 0) {
+
+            alert("Hey, you're a controller trying to connect to: " + window.location.href.split('?id=')[1]);
+
+        } else {
+
+            io.emit('game_connect');
+
+            var game_connected = function() {
+                var url = "http://192.168.1.8:8080?id=" + io.id;
+                document.body.innerHTML += url;
+                io.removeListener('game_connected', game_connected);
+            };
+
+            io.on('game_connected', game_connected);
+
+        }
+
+    });
+</script>
+
+</html>
