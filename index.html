@@ -15,7 +15,7 @@
     io.on('connect', function() {
         if (window.location.href.indexOf('?id=') > 0) {
 
-            alert("Hey, you're a controller trying to connect to: " + window.location.href.split('?id=')[1]);
+            io.emit('controller_connect', window.location.href.split('?id=')[1]);
 
         } else {
 
