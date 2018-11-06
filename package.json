@@ -2,7 +2,8 @@
   "name": "visual-learning",
   "version": "0.1.0",
   "devDependencies": {
-    "express": "*"
+    "express": "*",
+    "webpack-dev-server": "^3.1.10"
   },
   "dependencies": {
     "socket.io": "^2.1.1"

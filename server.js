@@ -6,6 +6,8 @@ var express = require('express'),
 var game_sockets = {};
 var controller_sockets = {};
 
+app.use(express.static('public'));
+
 server.listen(port);
 
 app.get('/', function(req, res) {
@@ -31,7 +33,7 @@ io.sockets.on('connection', function(socket) {
         socket.emit("game_connected");
     });
 
-    socket.on('controller_connect', function(game_socket_id){
+    socket.on('controller_connect', function(game_socket_id) {
         if (game_sockets[game_socket_id] && !game_sockets[game_socket_id].controller_id) {
 
             console.log("Controller Connected");
@@ -52,6 +54,37 @@ io.sockets.on('connection', function(socket) {
             socket.emit("controller_connected", false);
 
         }
-    })
+    });
+
+    socket.on('disconnect', function() {
+
+        // Game
+        if (game_sockets[socket.id]) {
+
+            console.log("Game Disconnected");
+
+            if (controller_sockets[game_sockets[socket.id].controller_id]) {
+
+                controller_sockets[game_sockets[socket.id].controller_id].socket.emit("controller_connected", false);
+                controller_sockets[game_sockets[socket.id].controller_id].game_id = undefined;
+            }
+
+            delete game_sockets[socket.id];
+        }
+
+        // Controller
+        if (controller_sockets[socket.id]) {
+
+            console.log("Controller Disconnected");
+
+            if (game_sockets[controller_sockets[socket.id].game_id]) {
+
+                game_sockets[controller_sockets[socket.id].game_id].socket.emit("controller_connected", false);
+                game_sockets[controller_sockets[socket.id].game_id].controller_id = undefined;
+            }
+
+            delete controller_sockets[socket.id];
+        }
+    });
 
 });
