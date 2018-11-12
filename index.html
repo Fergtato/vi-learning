@@ -6,12 +6,21 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="//davidshimjs.github.com/qrcodejs/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+    <script src="//threejs.org/build/three.min.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
 
-<!--     <script src="sketch.js" type="text/javascript"></script> -->
+    <!--     <script src="sketch.js" type="text/javascript"></script> -->
 
     <style>
-        canvas {
-            /* display: none; */
+        body {
+            margin: 0;
+        }
+
+        #qr {
+            position: absolute;
+            top: 0;
+            padding: 20px;
+            background: white;
         }
     </style>
 </head>
@@ -24,61 +33,112 @@
 
     io.on('connect', function() {
 
-        if (window.location.href.indexOf('?id=') > 0) {
+        io.emit('game_connect');
 
-            io.emit('controller_connect', window.location.href.split('?id=')[1]);
+        var qr = document.createElement('div');
+        qr.id = "qr";
+        document.body.appendChild(qr);
 
-            io.on('controller_connected', function(connected) {
-                if (connected) {
-                    alert("Connected");
-                    // document.getElementById('defaultCanvas0').style.display = 'block';
-                    function setup() {
-                        createCanvas(720,720);
-                        rectMode(CENTER);
-                    }
+        var game_connected = function() {
+            var url = "http://192.168.1.8:8080/controller.html?id=" + io.id;
+            // document.body.innerHTML += url;
+            console.log(url);
+            var qr_code = new QRCode("qr");
+            qr_code.makeCode(url);
+            io.removeListener('game_connected', game_connected);
+        };
 
-                    function draw() {
-                        background(0);
-                        fill(255,255,0);
-                        rect(mouseX,mouseY,100,100);
-                    }
-                } else {
-                    alert("Not Connected");
-                }
+        var camera, scene, renderer;
+        var earth, sun;
+        var spin = 0;
 
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.set(0, 2, 5);
+            camera.lookAt(scene.position);
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            var material = new THREE.MeshNormalMaterial();
+
+            var loader = new THREE.TextureLoader();
+
+
+            loader.load('earth.jpg', function(texture) {
+                var earthGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+                var earthMaterial = new THREE.MeshBasicMaterial({
+                    map: texture
+                })
+                earth = new THREE.Mesh(earthGeometry, earthMaterial);
+                scene.add(earth);
+                earth.translateX(3);
             });
 
-        } else {
 
-            io.emit('game_connect');
+            // var earthGeom = new THREE.SphereGeometry(0.1, 32, 32);
+            // earth = new THREE.Mesh(earthGeom, material);
+            // scene.add(earth);
+            // earth.translateX(3);
 
-            // var canvas = document.getElementById('defaultCanvas0');
-            // canvas.style.display = 'none';
-            // document.getElementById('defaultCanvas0').className='hide-me';
+            var sphere = new THREE.SphereGeometry(1.5, 32, 32);
+            sun = new THREE.Mesh(sphere, material);
+            scene.add(sun);
 
-            var qr = document.createElement('div');
-            qr.id = "qr";
-            document.body.appendChild(qr);
-
-            var game_connected = function() {
-                var url = "http://192.168.1.8:8080?id=" + io.id;
-                document.body.innerHTML += url;
-                var qr_code = new QRCode("qr");
-                qr_code.makeCode(url);
-                io.removeListener('game_connected', game_connected);
-            };
-
-            io.on('game_connected', game_connected);
-
-            io.on('controller_connected', function(connected) {
-                if (connected) {
-                    qr.style.display = "none";
-                } else {
-                    qr.style.display = "block";
-                }
+            loader.load('milkyway.jpg', function(texture) {
+                var sphereGeometry = new THREE.SphereGeometry(500, 60, 40)
+                var sphereMaterial = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    side: THREE.DoubleSide
+                })
+                sphereGeometry.scale(-1, 1, 1);
+                var mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                scene.add(mesh);
+                mesh.position.set(0, 0, 0)
             });
-
         }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            // earth.rotateY(0.01);
+
+            // spin += 0.003;
+            // console.log(spin);
+            // var timer = Date.now() * 0.0005;
+            // console.log(Math.cos(timer) * 10 + " | " + Math.sin(timer) * 10);
+            camera.position.x = Math.cos(spin) * 5;
+            camera.position.z = Math.sin(spin) * 5;
+
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        };
+
+        io.on('game_connected', game_connected);
+
+        io.on('controller_connected', function(connected) {
+            if (connected) {
+                document.getElementById("qr").style.display = "none";
+            } else {
+                document.getElementById("qr").style.display = "block";
+            }
+        });
+
+        io.on('clicked', function(message) {
+            spin += message;
+        });
+
+
 
     });
 </script>
