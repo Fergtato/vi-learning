@@ -91,4 +91,8 @@ io.sockets.on('connection', function(socket) {
         socket.broadcast.emit("clicked", message);
     });
 
+    socket.on('yRotate', function(yRotation) {
+        socket.broadcast.emit("yRotating", yRotation);
+    });
+
 });

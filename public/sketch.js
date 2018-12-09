@@ -1,5 +1,6 @@
 var io;
 var message;
+var yRotation;
 var moving = false;
 var rectPosX, rectPosY;
 
@@ -32,8 +33,10 @@ function draw() {
     // console.log(moving);
 
     if (moving) {
-        message = (width/2 - mouseX) / 9000;
-        io.emit('click', message);
+        message = (width/2 - mouseX);
+        yRotation = (height/2 - mouseY);
+        io.emit('click', map(message, 0, width/2, 0, 0.1));
+        io.emit('yRotate', map(yRotation, 0, width/2, 0, 0.1));
     }
 }
 
@@ -55,6 +58,8 @@ function touchEnded() {
 
     message = 0;
     io.emit('click', message);
+    yRotation = 0;
+    io.emit('yRotate', yRotation);
 }
 
 // var io = io.connect();
