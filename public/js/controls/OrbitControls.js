@@ -252,6 +252,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 	    sphericalDelta.phi -= angle;
 	};
 
+	this.getZoom = function() {
+		// console.log(scale *= getZoomScale());
+		// dollyOut( 2 );
+		scale = 0.9;
+	};
+
+	this.setPan = function() {
+		pan( 20, 0 );
+		scope.update();
+	};
+
 	this.setRotationX = function(angle) {
 	    sphericalDelta.theta = angle;
 	};

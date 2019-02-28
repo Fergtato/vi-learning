@@ -87,8 +87,8 @@ io.sockets.on('connection', function(socket) {
         }
     });
 
-    socket.on('click', function(message) {
-        socket.broadcast.emit("clicked", message);
+    socket.on('xRotate', function(xRotation) {
+        socket.broadcast.emit("xRotating", xRotation);
     });
 
     socket.on('yRotate', function(yRotation) {

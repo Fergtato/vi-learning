@@ -20,10 +20,17 @@
         body.dialogShowing { /* ...or body.dialogShowing */
           overflow: hidden;
         }
+
+        .lock-screen {
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
+            position: fixed;
+        }
     </style>
 </head>
 
-<body>
+<body class="lock-screen">
 </body>
 
 <script>
@@ -32,6 +39,12 @@
 // document.getElementById("defaultCanvas0").addEventListener("touchmove",   function(event) {event.preventDefault()})
 // document.getElementById("defaultCanvas0").addEventListener("touchend",    function(event) {event.preventDefault()})
 // document.getElementById("defaultCanvas0").addEventListener("touchcancel", function(event) {event.preventDefault()})
+
+// var canvas_dom = document.getElementById("defaultCanvas0");
+// canvas_dom.addEventListener("touchstart",  function(event) {event.preventDefault()})
+// canvas_dom.addEventListener("touchmove",   function(event) {event.preventDefault()})
+// canvas_dom.addEventListener("touchend",    function(event) {event.preventDefault()})
+// canvas_dom.addEventListener("touchcancel", function(event) {event.preventDefault()})
 </script>
 
 </html>
