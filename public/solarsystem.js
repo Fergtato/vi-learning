@@ -317,26 +317,13 @@ io.on('connect', function() {
         sun.material.opacity = opacityLevel;
         // earth.material.opacity = opacityLevel;
 
-        if (resetCamera) {
-            
-           
-            console.log("Fing");
-            if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
-                controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
-            }
-            if (resetCamera && Math.abs(controls.getPolarAngle()-1.5) > 0.1) {
-                controls.rotateY((Math.PI/50)*0.01*Math.sign(controls.getPolarAngle()-1.5));
-            }
-        
+        if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
+            controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
         }
-
-
-
-
-
-
-
-
+        if (resetCamera && Math.abs(controls.getPolarAngle()-1.5) > 0.1) {
+            controls.rotateY((Math.PI/50)*0.01*Math.sign(controls.getPolarAngle()-1.5));
+        }
+        
         // quaternion.setFromAxisAngle(axis, 0.005);
         // earth.position.applyQuaternion(quaternion);
         // mars.position.applyQuaternion(quaternion);
