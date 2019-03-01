@@ -10,7 +10,7 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-        var url = "http://192.168.105.176:8080/controller.html?id=" + io.id;
+        var url = "http://192.168.2.108:8080/controller.html?id=" + io.id;
         // document.body.innerHTML += url;
         console.log(url);
         var qr_code = new QRCode("qr");
