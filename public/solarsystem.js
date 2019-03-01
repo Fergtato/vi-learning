@@ -318,44 +318,16 @@ io.on('connect', function() {
         // earth.material.opacity = opacityLevel;
 
         if (resetCamera) {
-
-            if (controls.getAzimuthalAngle() < -0.1) {
-                if (controls.getAzimuthalAngle() < 0.1 && controls.getAzimuthalAngle() > -0.1) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateX((Math.PI/50)*-0.02);
-                }
-            } else if (controls.getAzimuthalAngle() > 0.1) {
-                if (controls.getAzimuthalAngle() < 0.1 && controls.getAzimuthalAngle() > -0.1) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateX((Math.PI/50)*0.02);
-                }
+            
+           
+            console.log("Fing");
+            if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
+                controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
             }
-
-            if (controls.getPolarAngle() < 1.5) {
-                if (controls.getPolarAngle() < 1.6 && controls.getPolarAngle() > 1.5) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateY((Math.PI/50)*-0.01);
-                }
-            } else if (controls.getPolarAngle() > 1.6) {
-                if (controls.getPolarAngle() < 1.6 && controls.getPolarAngle() > 1.5) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateY((Math.PI/50)*0.01);
-                }
+            if (resetCamera && Math.abs(controls.getPolarAngle()-1.5) > 0.1) {
+                controls.rotateY((Math.PI/50)*0.01*Math.sign(controls.getPolarAngle()-1.5));
             }
-
-            // if (camera.position.z > zoomDistance+2) {
-            //     camera.position.z -= 0.3;
-            // } else if (camera.position.z < zoomDistance-2) {
-            //     camera.position.z += 0.3;
-            // }
-
-            // console.log(camera.position.z);
-            // camera.position.z = 30;
-
+        
         }
 
 
