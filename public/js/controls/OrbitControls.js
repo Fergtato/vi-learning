@@ -161,9 +161,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
 
 			spherical.makeSafe();
+            
 
-
+            // IB
+            if (radiusChange != 0)
+            {
+                spherical.radius += radiusChange;
+                radiusChange = 0;
+            }
+            else
+            {
 			spherical.radius *= scale;
+            }
+
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
@@ -264,12 +274,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 	};
 
 	this.setRotationX = function(angle) {
-	    sphericalDelta.theta = angle;
+	    var target = angle
+		var current = this.getAzimuthalAngle();
+		var difference = target - current;
+        console.log(difference);
+	    sphericalDelta.theta = difference;
 	};
 
 	this.setRotationY = function(angle) {
 	    sphericalDelta.phi = angle;
 	};
+    // IB
+    this.stepIn = function(add) {
+      stepIn(add);  
+      
+    };
 
 	//
 	// internals
@@ -292,6 +311,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var sphericalDelta = new THREE.Spherical();
 
 	var scale = 1;
+    var radiusChange=0;
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
 
@@ -453,6 +473,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 	}
+    // IB
+    function stepIn(add)
+    {
+    //zoomChanged = true;
+    radiusChange = add    
+    }
+    
 
 	//
 	// event callbacks - update the object state

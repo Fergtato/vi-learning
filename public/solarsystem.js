@@ -220,18 +220,19 @@ io.on('connect', function() {
 
         //Test Key: "T"
         if(event.keyCode == 84) {
-            console.log("Camera X: " + controls.getAzimuthalAngle());
-            console.log("Camera Y: " + controls.getPolarAngle());
-
-            var coords = { z: camera.position.z };
-            var tween = new TWEEN.Tween(coords)
-            	.to({ z: 30 }, 1000)
-            	.onUpdate(function() {
-            		camera.position.z = this.z;
-                    console.log(this.z);
-            	})
+        var cfrom = { o: controls.getAzimuthalAngle() };
+            var ctween = new TWEEN.Tween(cfrom)
+                .to({ o: Math.PI }, 1000)
+                .onUpdate(function() {
+                    controls.setRotationX(this.o);
+                })
                 .easing(TWEEN.Easing.Quadratic.InOut)
-            	.start();
+                .start();
+        }
+
+        //Test Key: "U"
+        if(event.keyCode == 85) {
+            controls.stepIn(10);
         }
 
         if(event.keyCode == 70) {
