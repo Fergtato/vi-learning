@@ -234,6 +234,14 @@ io.on('connect', function() {
         if(event.keyCode == 85) {
             controls.stepIn(10);
         }
+        
+        if(event.keyCode == 90) {
+            console.log('Set 100');
+            controls.setRadius(100);
+        }
+        if(event.keyCode == 88) {
+            controls.setRadius(200);
+        }
 
         if(event.keyCode == 70) {
             resetCamera = !resetCamera;

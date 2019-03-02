@@ -169,6 +169,11 @@ THREE.OrbitControls = function ( object, domElement ) {
                 spherical.radius += radiusChange;
                 radiusChange = 0;
             }
+            else if (radiusSet != 0)
+            {
+                spherical.radius = radiusSet;
+                radiusSet = 0;
+            }
             else
             {
 			spherical.radius *= scale;
@@ -284,11 +289,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.setRotationY = function(angle) {
 	    sphericalDelta.phi = angle;
 	};
+
     // IB
     this.stepIn = function(add) {
       stepIn(add);  
-      
     };
+
+    this.setRadius  =function(rad) {
+        setRadius(rad);
+    }
 
 	//
 	// internals
@@ -311,7 +320,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var sphericalDelta = new THREE.Spherical();
 
 	var scale = 1;
+    // IB
     var radiusChange=0;
+    var radiusSet=0;
+    //
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
 
@@ -478,6 +490,12 @@ THREE.OrbitControls = function ( object, domElement ) {
     {
     //zoomChanged = true;
     radiusChange = add    
+    }
+    // IB
+    function setRadius(rad)
+    {
+    //zoomChanged = true;
+    radiusSet = rad    
     }
     
 
