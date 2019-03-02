@@ -161,24 +161,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
 
 			spherical.makeSafe();
-            
 
-            // IB
-            if (radiusChange != 0)
-            {
+
+			// CUSTOM
+            if (radiusChange != 0) {
                 spherical.radius += radiusChange;
                 radiusChange = 0;
-            }
-            else if (radiusSet != 0)
-            {
+            } else if (radiusSet != 0) {
                 spherical.radius = radiusSet;
                 radiusSet = 0;
+            } else {
+				spherical.radius *= scale;
             }
-            else
-            {
-			spherical.radius *= scale;
-            }
-
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
@@ -278,16 +272,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	};
 
 	this.setRotationX = function(angle) {
-<<<<<<< HEAD
 		var target = angle;
 		var current = this.getAzimuthalAngle();
 		var difference = target - current;
-=======
-	    var target = angle
-		var current = this.getAzimuthalAngle();
-		var difference = target - current;
-        console.log(difference);
->>>>>>> 0ba4de6b6915d8d71d0bf1e673bd89105dc60438
 	    sphericalDelta.theta = difference;
 	};
 
@@ -298,14 +285,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 	    sphericalDelta.phi = difference;
 	};
 
-    // IB
+	// CUSTOM
     this.stepIn = function(add) {
-      stepIn(add);  
+    	stepIn(add);
     };
 
-    this.setRadius  =function(rad) {
-        setRadius(rad);
+    this.setRadius = function(rad) {
+    	setRadius(rad);
     }
+
+	this.getRadius = function() {
+		return spherical.radius;
+	}
 
 	//
 	// internals
@@ -328,10 +319,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var sphericalDelta = new THREE.Spherical();
 
 	var scale = 1;
-    // IB
+
+	// CUSTOM
     var radiusChange=0;
     var radiusSet=0;
     //
+
 	var panOffset = new THREE.Vector3();
 	var zoomChanged = false;
 
@@ -493,19 +486,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 	}
-    // IB
-    function stepIn(add)
-    {
-    //zoomChanged = true;
-    radiusChange = add    
+
+	// CUSTOM
+    function stepIn(add) {
+	    //zoomChanged = true;
+	    radiusChange = add
     }
-    // IB
-    function setRadius(rad)
-    {
-    //zoomChanged = true;
-    radiusSet = rad    
+    // CUSTOM
+    function setRadius(rad){
+	    //zoomChanged = true;
+	    radiusSet = rad
     }
-    
 
 	//
 	// event callbacks - update the object state

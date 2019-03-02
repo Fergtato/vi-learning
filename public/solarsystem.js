@@ -10,11 +10,7 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-<<<<<<< HEAD
         var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
-=======
-        var url = "http://192.168.2.108:8080/controller.html?id=" + io.id;
->>>>>>> 0ba4de6b6915d8d71d0bf1e673bd89105dc60438
         // document.body.innerHTML += url;
         console.log(url);
         var qr_code = new QRCode("qr");
@@ -262,42 +258,19 @@ io.on('connect', function() {
 
         //Test Key: T
         if(event.keyCode == 84) {
-<<<<<<< HEAD
 
-            setCamera(Math.PI, Math.PI/4, 2000);
-=======
-        var cfrom = { o: controls.getAzimuthalAngle() };
-            var ctween = new TWEEN.Tween(cfrom)
-                .to({ o: Math.PI }, 1000)
-                .onUpdate(function() {
-                    controls.setRotationX(this.o);
-                })
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .start();
+            setCamera(Math.PI, Math.PI/2, 40, 2000);
         }
 
         //Test Key: "U"
         if(event.keyCode == 85) {
-            controls.stepIn(10);
-        }
-        
-        if(event.keyCode == 90) {
-            console.log('Set 100');
-            controls.setRadius(100);
-        }
-        if(event.keyCode == 88) {
-            controls.setRadius(200);
->>>>>>> 0ba4de6b6915d8d71d0bf1e673bd89105dc60438
-        }
-
-        //Test Key: "U"
-        if(event.keyCode == 85) {
-            controls.dollyIn(20);
+            console.log(controls.getRadius());
         }
 
         //Key: F
         if(event.keyCode == 70) {
-            resetCamera = !resetCamera;
+            // resetCamera = !resetCamera;
+            controls.setPan();
 
 
         }
@@ -317,9 +290,25 @@ io.on('connect', function() {
             showBigPlanet(1);
         }
 
+        if(event.keyCode == 90) {
+            var zFrom = { t: controls.getRadius() };
+            var zTween = new TWEEN.Tween(zFrom)
+                .to({ t: 40 }, 1000)
+                .onUpdate(function() {
+                    controls.setRadius(this.t);
+                })
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .start();
+
+
+        }
+        if(event.keyCode == 88) {
+            controls.setRadius(200);
+        }
+
     }
 
-    function setCamera(xRotation, yRotation, time) {
+    function setCamera(xRotation, yRotation, zDistance, time) {
         var xFrom = { t: controls.getAzimuthalAngle() };
         var xTween = new TWEEN.Tween(xFrom)
             .to({ t: xRotation }, time)
@@ -334,6 +323,15 @@ io.on('connect', function() {
             .to({ t: yRotation }, time)
             .onUpdate(function() {
                 controls.setRotationY(this.t);
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
+
+        var zFrom = { t: controls.getRadius() };
+        var zTween = new TWEEN.Tween(zFrom)
+            .to({ t: 40 }, 1000)
+            .onUpdate(function() {
+                controls.setRadius(this.t);
             })
             .easing(TWEEN.Easing.Quadratic.InOut)
             .start();
@@ -443,7 +441,6 @@ io.on('connect', function() {
         planets[8].rotateOnPivot(0.001);
         planets[9].rotateOnPivot(0.0013);
 
-<<<<<<< HEAD
 
         if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
             controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
@@ -456,38 +453,6 @@ io.on('connect', function() {
 
 
         // controls.target = planets[2].pivot.position;
-=======
-        for (var i = 0; i < planets.length; i++) {
-            planets[i].material.opacity = opacityLevel;
-        }
-        sun.material.opacity = opacityLevel;
-        // earth.material.opacity = opacityLevel;
-
-        if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
-            controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
-        }
-        if (resetCamera && Math.abs(controls.getPolarAngle()-1.5) > 0.1) {
-            controls.rotateY((Math.PI/50)*0.01*Math.sign(controls.getPolarAngle()-1.5));
-        }
-        
-        // quaternion.setFromAxisAngle(axis, 0.005);
-        // earth.position.applyQuaternion(quaternion);
-        // mars.position.applyQuaternion(quaternion);
-
-        // spin += 0.001;
-        //
-        // camera.position.x = Math.cos(spin) * 5;
-        // camera.position.z = Math.sin(spin) * 5;
-        // camera.position.y = yRotationValue;
-        //
-        // camera.lookAt(scene.position);
-
-        // controls.rotateLeft(Math.PI/500);
-        // controls.rotateUp(Math.PI/500);
-
-
-        // controls.target.set(saturn.position.x,saturn.position.y,saturn.position.z);
->>>>>>> 0ba4de6b6915d8d71d0bf1e673bd89105dc60438
 
         TWEEN.update();
         controls.update();
