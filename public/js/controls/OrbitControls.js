@@ -252,10 +252,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	    sphericalDelta.phi -= angle;
 	};
 
-	this.getZoom = function() {
-		// console.log(scale *= getZoomScale());
-		// dollyOut( 2 );
-		scale = 0.9;
+	this.dollyIn = function(scale) {
+		spherical.radius = 10;
+		console.log(spherical.radius);
 	};
 
 	this.setPan = function() {
@@ -264,11 +263,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 	};
 
 	this.setRotationX = function(angle) {
-	    sphericalDelta.theta = angle;
+		var target = angle;
+		var current = this.getAzimuthalAngle();
+		var difference = target - current;
+	    sphericalDelta.theta = difference;
 	};
 
 	this.setRotationY = function(angle) {
-	    sphericalDelta.phi = angle;
+		var target = angle;
+		var current = this.getPolarAngle();
+		var difference = target - current;
+	    sphericalDelta.phi = difference;
 	};
 
 	//

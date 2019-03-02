@@ -10,7 +10,7 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-        var url = "http://192.168.105.176:8080/controller.html?id=" + io.id;
+        var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
         // document.body.innerHTML += url;
         console.log(url);
         var qr_code = new QRCode("qr");
@@ -27,6 +27,7 @@ io.on('connect', function() {
         controls;
 
     var planets = [];
+    var bigPlanets = [];
 
     var sun,
         mercury,
@@ -36,7 +37,6 @@ io.on('connect', function() {
         mars,
         jupiter,
         saturn,
-        saturnsRings, saturnsRingsPivot,
         uranus,
         neptune,
         pluto;
@@ -45,7 +45,7 @@ io.on('connect', function() {
     var resetCamera = false;
     var zoomDistance = 40;
 
-    var opacityTween;
+    var zoomTween;
     // var spin = 0;
     // var yRotationValue = 0;
     // const axis = new THREE.Vector3(0, 1, 0).normalize();
@@ -88,7 +88,7 @@ io.on('connect', function() {
         };
 
         class Planet {
-            constructor(name, radius, widthSegments, heightSegments, loader, textureImg, distance) {
+            constructor(name, radius, widthSegments, heightSegments, loader, textureImg, distance, showRings) {
                 this.name = name;
                 this.geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
                 this.texture = loader.load( textureImg );
@@ -98,11 +98,32 @@ io.on('connect', function() {
                 this.mesh = new THREE.Mesh(this.geometry, this.material);
                 this.mesh.position.x = distance;
                 this.pivot = new THREE.Object3D();
+
+                this.trackMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+                this.trackMaterial.transparent = true;
+                this.trackGeom = new THREE.TorusGeometry( distance, 0.1, 16, 100 );
+                this.trackMesh = new THREE.Mesh( this.trackGeom, this.trackMaterial );
+                this.trackMesh.rotation.x = Math.PI / 2;
+
+                this.showRings = showRings;
+                if (this.showRings) {
+                    this.ringsPivot = new THREE.Object3D();
+                    this.mesh.add( this.ringsPivot );
+                    this.ringsGeometry = new THREE.CircleGeometry( 9, 32 );
+                    this.ringsTexture = loader.load( 'saturn_ring_alpha.png' );
+                    this.ringsMaterial = new THREE.MeshLambertMaterial( { map: this.ringsTexture,
+                    side: THREE.DoubleSide } );
+                    this.ringsMaterial.transparent = true;
+                    this.rings = new THREE.Mesh( this.ringsGeometry, this.ringsMaterial );
+                    this.rings.rotation.x = 5;
+                    this.ringsPivot.add( this.rings );
+                }
             }
 
             addToPivot(pivotPoint) {
                 pivotPoint.mesh.add( this.pivot );
                 this.pivot.add(this.mesh);
+                scene.add( this.trackMesh );
             }
 
             rotateOnAxis(speed) {
@@ -112,6 +133,46 @@ io.on('connect', function() {
             rotateOnPivot(speed) {
                 this.pivot.rotation.y += speed;
             }
+
+            setOpacity(opacity) {
+                this.material.opacity = opacity;
+                this.trackMaterial.opacity = opacity;
+                if (this.showRings) {
+                    this.ringsMaterial.opacity = opacity;
+                }
+            }
+
+            visible(boolean) {
+                this.mesh.visible = boolean;
+                this.trackMesh.visible = boolean;
+            }
+
+        };
+
+        class BigPlanet {
+            constructor(name, radius, widthSegments, heightSegments, loader, textureImg) {
+                this.name = name;
+                this.geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+                this.texture = loader.load( textureImg );
+                // this.material = new THREE.MeshBasicMaterial( { map: this.texture } );
+                this.material = new THREE.MeshLambertMaterial( { map: this.texture } );
+                this.material.transparent = true;
+                this.material.opacity = 0;
+                this.mesh = new THREE.Mesh(this.geometry, this.material);
+                this.mesh.visible = false;
+            }
+
+            addToScene() {
+                scene.add(this.mesh);
+            }
+
+            rotateOnAxis(speed) {
+                this.mesh.rotateY(speed);
+            }
+
+            visible(boolean) {
+                this.mesh.visible = boolean;
+            }
         };
 
         // SUN
@@ -119,67 +180,54 @@ io.on('connect', function() {
         sun.addToScene();
 
         // MERCURY
-        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'mercury.jpg', 20);
+        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'mercury.jpg', 20, false);
         planets[0].addToPivot(sun);
 
         // VENUS
-        planets[1] = new Planet("venus", 2, 32, 32, loader, 'venus.jpg', 30);
+        planets[1] = new Planet("venus", 2, 32, 32, loader, 'venus.jpg', 30, false);
         planets[1].addToPivot(sun);
 
         // EARTH
-        planets[2] = new Planet("earth", 3, 64, 64, loader, 'earth.jpg', 40);
+        planets[2] = new Planet("earth", 3, 64, 64, loader, 'earth.jpg', 40, false);
         planets[2].addToPivot(sun);
 
         // MOON
-        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'moon.jpg', 5);
+        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'moon.jpg', 5, false);
         planets[3].addToPivot(planets[2]);
 
         // MARS
-        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'mars.jpg', 50);
+        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'mars.jpg', 50, false);
         planets[4].addToPivot(sun);
 
         // JUPITER
-        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'jupiter.jpg', 60);
+        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'jupiter.jpg', 60, false);
         planets[5].addToPivot(sun);
 
         // SATURN
-        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'saturn.jpg', 70);
+        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'saturn.jpg', 70, true);
         planets[6].addToPivot(sun);
 
-        // --------------------FIX
-        // saturnsRingsPivot = new THREE.Object3D();
-        // saturn.add( saturnsRingsPivot );
-        //
-        // var saturnsRingsGeometry = new THREE.CircleGeometry( 9, 32 );
-        // var saturnsRingsTexture = loader.load( 'saturn_ring_alpha.png' );
-        // var saturnsRingsMaterial = new THREE.MeshLambertMaterial( { map: saturnsRingsTexture,
-        // side: THREE.DoubleSide } );
-        // saturnsRings = new THREE.Mesh( saturnsRingsGeometry, saturnsRingsMaterial );
-        // saturnsRings.rotation.x = 5;
-        // saturnsRingsPivot.add( saturnsRings );
-        // --------------------FIX
-
-        //
         // URANUS
-        //
-
-        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'uranus.jpg', 80);
+        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'uranus.jpg', 80, false);
         planets[7].addToPivot(sun);
 
-        //
         // NEPTUNE
-        //
-
-        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'neptune.jpg', 90);
+        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'neptune.jpg', 90, false);
         planets[8].addToPivot(sun);
 
-        //
         // PLUTO
-        //
-
-        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'pluto.jpg', 100);
+        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'pluto.jpg', 100, false);
         planets[9].addToPivot(sun);
 
+
+
+        //Highres Earth
+        bigPlanets[0] = new BigPlanet("earth2", 20, 64, 64, loader, 'earth.jpg');
+        bigPlanets[0].addToScene();
+
+        //Highres Mars
+        bigPlanets[1] = new BigPlanet("mars2", 20, 64, 64, loader, 'mars.jpg');
+        bigPlanets[1].addToScene();
 
 
         loader.load('stars_milky_way.jpg', function(texture) {
@@ -194,8 +242,6 @@ io.on('connect', function() {
             mesh.position.set(0, 0, 0)
         });
 
-        rings();
-
         var light = new THREE.PointLight( 0xffffff, 2, 400 );
         light.position.set( 0, 0, 0 );
         scene.add( light );
@@ -205,77 +251,142 @@ io.on('connect', function() {
 
         document.addEventListener('keydown', Keyboard, false);
 
-        var opacityFrom = { o: 1 };
-        opacityTween = new TWEEN.Tween(opacityFrom)
-            .to({ o: 0 }, 1000)
-            .onUpdate(function() {
-                opacityLevel = this.o;
-            })
-            .easing(TWEEN.Easing.Quadratic.InOut);
-
 
     }
 
     function Keyboard() {
 
-        //Test Key: "T"
+        //Test Key: T
         if(event.keyCode == 84) {
-            console.log("Camera X: " + controls.getAzimuthalAngle());
-            console.log("Camera Y: " + controls.getPolarAngle());
 
-            var coords = { z: camera.position.z };
-            var tween = new TWEEN.Tween(coords)
-            	.to({ z: 30 }, 1000)
-            	.onUpdate(function() {
-            		camera.position.z = this.z;
-                    console.log(this.z);
-            	})
-                .easing(TWEEN.Easing.Quadratic.InOut)
-            	.start();
+            setCamera(Math.PI, Math.PI/4, 2000);
         }
 
+        //Test Key: "U"
+        if(event.keyCode == 85) {
+            controls.dollyIn(20);
+        }
+
+        //Key: F
         if(event.keyCode == 70) {
             resetCamera = !resetCamera;
 
 
         }
 
+        //Key: H
         if(event.keyCode == 72) {
-            console.log("hide");
-
-            opacityTween.start();
-
+            showSolarSytem();
         }
 
+        //Key: 1
         if(event.keyCode == 49) {
-            zoomDistance = 20;
+            showBigPlanet(0);
         }
 
+        //Key: 2
         if(event.keyCode == 50) {
-            zoomDistance = 70;
+            showBigPlanet(1);
         }
-
-
-
-
-
-        // console.log(controls.getZoom());
-
-
-        // console.log(camera.position);
 
     }
 
-    function rings() {
-        var ringMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    function setCamera(xRotation, yRotation, time) {
+        var xFrom = { t: controls.getAzimuthalAngle() };
+        var xTween = new TWEEN.Tween(xFrom)
+            .to({ t: xRotation }, time)
+            .onUpdate(function() {
+                controls.setRotationX(this.t);
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
 
-        for (i = 0; i < 9; i++) {
-            var ringgeom = new THREE.TorusGeometry( (i+2)*10, 0.1, 16, 100 );
-            var ring = new THREE.Mesh( ringgeom, ringMaterial );
-            ring.rotation.x = Math.PI / 2;
-            scene.add( ring );
-        }
+        var yFrom = { t: controls.getPolarAngle() };
+        var yTween = new TWEEN.Tween(yFrom)
+            .to({ t: yRotation }, time)
+            .onUpdate(function() {
+                controls.setRotationY(this.t);
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
+    }
 
+    function showBigPlanet(planet) {
+        //fade solarsystem to hidden
+        var opacityFrom = { o: 1 };
+        var opacityTween = new TWEEN.Tween(opacityFrom)
+            .to({ o: 0 }, 1000)
+            .onUpdate(function() {
+                for (var i = 0; i < planets.length; i++) {
+                    planets[i].setOpacity(this.o);
+                }
+                for (var i = 0; i < bigPlanets.length; i++) {
+                    bigPlanets[i].material.opacity = this.o;
+                }
+                sun.material.opacity = this.o;
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .onComplete(function() {
+                //set solarsystem visiblity to false
+                for (var i = 0; i < planets.length; i++) {
+                    planets[i].visible(false);
+                }
+                sun.mesh.visible = false;
+                for (var i = 0; i < bigPlanets.length; i++) {
+                    bigPlanets[i].visible(false);
+                }
+                //set big planet visiblity to true
+                bigPlanets[planet].visible(true);
+            })
+            .start();
+
+        //fade chosen big planet to visible
+        var from = { o: bigPlanets[planet].material.opacity };
+        var tween = new TWEEN.Tween(from)
+            .to({ o: 1 }, 1000)
+            .delay(1000)
+            .onUpdate(function() {
+                bigPlanets[planet].material.opacity = this.o;
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
+    }
+
+    function showSolarSytem() {
+        //fade big planet to hidden
+        var from = { o: 1 };
+        var tween = new TWEEN.Tween(from)
+            .to({ o: 0 }, 1000)
+            .onUpdate(function() {
+                for (var i = 0; i < bigPlanets.length; i++) {
+                    bigPlanets[i].material.opacity = this.o;
+                }
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .onComplete(function() {
+                for (var i = 0; i < bigPlanets.length; i++) {
+                    bigPlanets[i].visible(false);
+                }
+
+                for (var i = 0; i < planets.length; i++) {
+                    planets[i].visible(true);
+                }
+                sun.mesh.visible = true;
+            })
+            .start();
+
+        var opacityFrom = { o: 0 };
+        var opacityTween = new TWEEN.Tween(opacityFrom)
+            .to({ o: 1 }, 1000)
+            .delay(1000)
+            .onUpdate(function() {
+                for (var i = 0; i < planets.length; i++) {
+                    planets[i].setOpacity(this.o);
+                }
+                sun.material.opacity = this.o;
+            })
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
     }
 
     function animate() {
@@ -287,18 +398,11 @@ io.on('connect', function() {
 
         for (var i = 0; i < planets.length; i++) {
             planets[i].rotateOnAxis(-0.003);
-            // console.log(i);
         }
-        // planets[0].rotateOnAxis(-0.003);
-        // planets[1].rotateOnAxis(-0.003);
-        // planets[2].rotateOnAxis(-0.003);
-        // planets[3].rotateOnAxis(-0.003);
-        // planets[4].rotateOnAxis(-0.003);
-        // planets[5].rotateOnAxis(-0.003);
-        // planets[6].rotateOnAxis(-0.003);
-        // planets[7].rotateOnAxis(-0.003);
-        // planets[8].rotateOnAxis(-0.003);
-        // planets[9].rotateOnAxis(-0.003);
+
+        for (var i = 0; i < bigPlanets.length; i++) {
+            bigPlanets[i].rotateOnAxis(-0.003);
+        }
 
         planets[0].rotateOnPivot(0.0047);
         planets[1].rotateOnPivot(0.0035);
@@ -311,77 +415,18 @@ io.on('connect', function() {
         planets[8].rotateOnPivot(0.001);
         planets[9].rotateOnPivot(0.0013);
 
-        for (var i = 0; i < planets.length; i++) {
-            planets[i].material.opacity = opacityLevel;
+
+        if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
+            controls.rotateX((Math.PI/50)*0.02*Math.sign(controls.getAzimuthalAngle()));
         }
-        sun.material.opacity = opacityLevel;
-        // earth.material.opacity = opacityLevel;
-
-        if (resetCamera) {
-
-            if (controls.getAzimuthalAngle() < -0.1) {
-                if (controls.getAzimuthalAngle() < 0.1 && controls.getAzimuthalAngle() > -0.1) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateX((Math.PI/50)*-0.02);
-                }
-            } else if (controls.getAzimuthalAngle() > 0.1) {
-                if (controls.getAzimuthalAngle() < 0.1 && controls.getAzimuthalAngle() > -0.1) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateX((Math.PI/50)*0.02);
-                }
-            }
-
-            if (controls.getPolarAngle() < 1.5) {
-                if (controls.getPolarAngle() < 1.6 && controls.getPolarAngle() > 1.5) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateY((Math.PI/50)*-0.01);
-                }
-            } else if (controls.getPolarAngle() > 1.6) {
-                if (controls.getPolarAngle() < 1.6 && controls.getPolarAngle() > 1.5) {
-                    // console.log("STOP");
-                } else {
-                    controls.rotateY((Math.PI/50)*0.01);
-                }
-            }
-
-            // if (camera.position.z > zoomDistance+2) {
-            //     camera.position.z -= 0.3;
-            // } else if (camera.position.z < zoomDistance-2) {
-            //     camera.position.z += 0.3;
-            // }
-
-            // console.log(camera.position.z);
-            // camera.position.z = 30;
-
+        if (resetCamera && Math.abs(controls.getPolarAngle()-1.55) > 0.02) {
+            controls.rotateY((Math.PI/50)*0.01*Math.sign(controls.getPolarAngle()-1.55));
         }
 
 
 
 
-
-
-
-
-        // quaternion.setFromAxisAngle(axis, 0.005);
-        // earth.position.applyQuaternion(quaternion);
-        // mars.position.applyQuaternion(quaternion);
-
-        // spin += 0.001;
-        //
-        // camera.position.x = Math.cos(spin) * 5;
-        // camera.position.z = Math.sin(spin) * 5;
-        // camera.position.y = yRotationValue;
-        //
-        // camera.lookAt(scene.position);
-
-        // controls.rotateLeft(Math.PI/500);
-        // controls.rotateUp(Math.PI/500);
-
-
-        // controls.target.set(saturn.position.x,saturn.position.y,saturn.position.z);
+        // controls.target = planets[2].pivot.position;
 
         TWEEN.update();
         controls.update();
