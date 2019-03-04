@@ -10,7 +10,7 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-        var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
+        var url = "http://192.168.104.182:8080/controller.html?id=" + io.id;
         // document.body.innerHTML += url;
         console.log(url);
         var qr_code = new QRCode("qr");
@@ -88,7 +88,7 @@ io.on('connect', function() {
         };
 
         class Planet {
-            constructor(name, radius, widthSegments, heightSegments, loader, textureImg, distance, showRings) {
+            constructor(name, radius, widthSegments, heightSegments, loader, textureImg, distance, showRings, pivotSpeed) {
                 this.name = name;
                 this.geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
                 this.texture = loader.load( textureImg );
@@ -98,6 +98,8 @@ io.on('connect', function() {
                 this.mesh = new THREE.Mesh(this.geometry, this.material);
                 this.mesh.position.x = distance;
                 this.pivot = new THREE.Object3D();
+                this.spinSpeed = -0.01;
+                this.pivotSpeed = pivotSpeed;
 
                 this.trackMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
                 this.trackMaterial.transparent = true;
@@ -126,12 +128,12 @@ io.on('connect', function() {
                 scene.add( this.trackMesh );
             }
 
-            rotateOnAxis(speed) {
-                this.mesh.rotateY(speed);
+            rotateOnAxis() {
+                this.mesh.rotateY(this.spinSpeed);
             }
 
-            rotateOnPivot(speed) {
-                this.pivot.rotation.y += speed;
+            rotateOnPivot() {
+                this.pivot.rotation.y += this.pivotSpeed;
             }
 
             setOpacity(opacity) {
@@ -180,43 +182,43 @@ io.on('connect', function() {
         sun.addToScene();
 
         // MERCURY
-        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'mercury.jpg', 20, false);
+        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'mercury.jpg', 20, false, 0.0047);
         planets[0].addToPivot(sun);
 
         // VENUS
-        planets[1] = new Planet("venus", 2, 32, 32, loader, 'venus.jpg', 30, false);
+        planets[1] = new Planet("venus", 2, 32, 32, loader, 'venus.jpg', 30, false, 0.0035);
         planets[1].addToPivot(sun);
 
         // EARTH
-        planets[2] = new Planet("earth", 3, 64, 64, loader, 'earth.jpg', 40, false);
+        planets[2] = new Planet("earth", 3, 64, 64, loader, 'earth.jpg', 40, false, 0.0029);
         planets[2].addToPivot(sun);
 
         // MOON
-        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'moon.jpg', 5, false);
+        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'moon.jpg', 5, false, 0.01);
         planets[3].addToPivot(planets[2]);
 
         // MARS
-        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'mars.jpg', 50, false);
+        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'mars.jpg', 50, false, 0.0024);
         planets[4].addToPivot(sun);
 
         // JUPITER
-        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'jupiter.jpg', 60, false);
+        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'jupiter.jpg', 60, false, 0.002);
         planets[5].addToPivot(sun);
 
         // SATURN
-        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'saturn.jpg', 70, true);
+        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'saturn.jpg', 70, true, 0.0014);
         planets[6].addToPivot(sun);
 
         // URANUS
-        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'uranus.jpg', 80, false);
+        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'uranus.jpg', 80, false, 0.0022);
         planets[7].addToPivot(sun);
 
         // NEPTUNE
-        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'neptune.jpg', 90, false);
+        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'neptune.jpg', 90, false, 0.001);
         planets[8].addToPivot(sun);
 
         // PLUTO
-        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'pluto.jpg', 100, false);
+        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'pluto.jpg', 100, false, 0.0013);
         planets[9].addToPivot(sun);
 
 
@@ -264,7 +266,7 @@ io.on('connect', function() {
 
         //Test Key: "U"
         if(event.keyCode == 85) {
-            console.log(controls.getRadius());
+            setCamera(Math.PI/2, 0, 150, 2000);
         }
 
         //Key: F
@@ -329,7 +331,7 @@ io.on('connect', function() {
 
         var zFrom = { t: controls.getRadius() };
         var zTween = new TWEEN.Tween(zFrom)
-            .to({ t: 40 }, 1000)
+            .to({ t: zDistance }, 1000)
             .onUpdate(function() {
                 controls.setRadius(this.t);
             })
@@ -423,23 +425,13 @@ io.on('connect', function() {
     function render() {
 
         for (var i = 0; i < planets.length; i++) {
-            planets[i].rotateOnAxis(-0.003);
+            planets[i].rotateOnAxis();
+            planets[i].rotateOnPivot();
         }
 
         for (var i = 0; i < bigPlanets.length; i++) {
             bigPlanets[i].rotateOnAxis(-0.003);
         }
-
-        planets[0].rotateOnPivot(0.0047);
-        planets[1].rotateOnPivot(0.0035);
-        planets[2].rotateOnPivot(0.0029);
-        planets[3].rotateOnPivot(0.01);
-        planets[4].rotateOnPivot(0.0024);
-        planets[5].rotateOnPivot(0.002);
-        planets[6].rotateOnPivot(0.0014);
-        planets[7].rotateOnPivot(0.0022);
-        planets[8].rotateOnPivot(0.001);
-        planets[9].rotateOnPivot(0.0013);
 
 
         if (resetCamera && Math.abs(controls.getAzimuthalAngle()) > 0.1) {
@@ -471,9 +463,7 @@ io.on('connect', function() {
     });
 
     io.on('xRotating', function(xRotation) {
-        // spin += message;
         controls.rotateX((Math.PI/50)*xRotation);
-        // console.log(message);
     });
 
     io.on('yRotating', function(yRotation) {

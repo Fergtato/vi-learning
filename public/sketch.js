@@ -3,6 +3,7 @@ var xRotation;
 var yRotation;
 var moving = false;
 var rectPosX, rectPosY;
+let r = 0;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
@@ -25,7 +26,7 @@ function setup() {
 }
 
 function draw() {
-    background(0);
+    background(r);
     fill(255,255,0);
     rect(rectPosX,rectPosY,20,20);
 
@@ -60,6 +61,10 @@ function touchEnded() {
     io.emit('xRotate', xRotation);
     yRotation = 0;
     io.emit('yRotate', yRotation);
+}
+
+function deviceMoved() {
+  r = map(accelerationX, -90, 90, 0, 255);
 }
 
 // var io = io.connect();
