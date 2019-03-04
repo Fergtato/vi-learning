@@ -1,6 +1,9 @@
 {
   "name": "visual-learning",
   "version": "0.1.0",
+  "scripts": {
+    "start": "node server.js"
+  },
   "devDependencies": {
     "express": "*",
     "webpack-dev-server": "^3.1.10"
