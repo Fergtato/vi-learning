@@ -10,9 +10,7 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-
-        var url = process.env.URL || "http://192.168.104.182:8080";
-        url += "/controller.html?id=" + io.id;
+        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
         // document.body.innerHTML += url;
         console.log(url);
         var qr_code = new QRCode("qr");
