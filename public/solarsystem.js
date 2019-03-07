@@ -152,7 +152,7 @@ io.on('connect', function() {
         };
 
         class BigPlanet {
-            constructor(name, radius, widthSegments, heightSegments, loader, textureImg) {
+            constructor(name, radius, widthSegments, heightSegments, loader, textureImg, cloudTexture) {
                 this.name = name;
                 this.geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
                 this.texture = loader.load( textureImg );
@@ -162,18 +162,42 @@ io.on('connect', function() {
                 this.material.opacity = 0;
                 this.mesh = new THREE.Mesh(this.geometry, this.material);
                 this.mesh.visible = false;
+
+                //clouds
+                this.cloudGeometry = new THREE.SphereGeometry(radius+0.1, widthSegments, heightSegments);
+                this.cloudTexture = loader.load( cloudTexture );
+                this.cloudMaterial = new THREE.MeshLambertMaterial( { map: this.cloudTexture } );
+                this.cloudMaterial.transparent = true;
+                this.cloudMaterial.opacity = 0;
+                this.cloudMesh = new THREE.Mesh(this.cloudGeometry, this.cloudMaterial);
+                this.cloudMesh.visible = false;
+
+                this.bigPlanetLight = new THREE.PointLight( 0xffffff, 0, 200 );
+                this.bigPlanetLight.position.set( 50, 20, 0 );
+                this.bigPlanetLight.visible = false;
             }
 
             addToScene() {
                 scene.add(this.mesh);
+                scene.add(this.cloudMesh);
+                scene.add(this.bigPlanetLight);
             }
 
             rotateOnAxis(speed) {
                 this.mesh.rotateY(speed);
+                this.cloudMesh.rotateY(-speed);
+            }
+
+            setOpacity(opacity) {
+                this.material.opacity = opacity;
+                this.cloudMaterial.opacity = opacity;
+                this.bigPlanetLight.intensity = opacity;
             }
 
             visible(boolean) {
                 this.mesh.visible = boolean;
+                this.cloudMesh.visible = boolean;
+                this.bigPlanetLight.visible = boolean;
             }
         };
 
@@ -223,13 +247,17 @@ io.on('connect', function() {
 
 
 
-        //Highres Earth
-        bigPlanets[0] = new BigPlanet("earth2", 20, 64, 64, loader, 'earth.jpg');
+        //Highres Mercury
+        bigPlanets[0] = new BigPlanet("mercury2", 20, 64, 64, loader, 'mercury.jpg', 'earth_clouds.png');
         bigPlanets[0].addToScene();
 
-        //Highres Mars
-        bigPlanets[1] = new BigPlanet("mars2", 20, 64, 64, loader, 'mars.jpg');
+        //Highres Earth
+        bigPlanets[1] = new BigPlanet("earth2", 20, 64, 64, loader, 'earth.jpg', 'earth_clouds.png');
         bigPlanets[1].addToScene();
+
+        //Highres Mars
+        bigPlanets[2] = new BigPlanet("mars2", 20, 64, 64, loader, 'mars.jpg', 'earth_clouds.png');
+        bigPlanets[2].addToScene();
 
 
         loader.load('stars_milky_way.jpg', function(texture) {
@@ -261,7 +289,7 @@ io.on('connect', function() {
         //Test Key: T
         if(event.keyCode == 84) {
 
-            setCamera(Math.PI, Math.PI/2, 40, 2000);
+            setCamera(Math.PI/4, Math.PI/2, 40, 2000);
         }
 
         //Test Key: "U"
@@ -349,7 +377,7 @@ io.on('connect', function() {
                     planets[i].setOpacity(this.o);
                 }
                 for (var i = 0; i < bigPlanets.length; i++) {
-                    bigPlanets[i].material.opacity = this.o;
+                    bigPlanets[i].setOpacity(this.o);
                 }
                 sun.material.opacity = this.o;
             })
@@ -374,7 +402,7 @@ io.on('connect', function() {
             .to({ o: 1 }, 1000)
             .delay(1000)
             .onUpdate(function() {
-                bigPlanets[planet].material.opacity = this.o;
+                bigPlanets[planet].setOpacity(this.o);
             })
             .easing(TWEEN.Easing.Quadratic.InOut)
             .start();
@@ -387,7 +415,7 @@ io.on('connect', function() {
             .to({ o: 0 }, 1000)
             .onUpdate(function() {
                 for (var i = 0; i < bigPlanets.length; i++) {
-                    bigPlanets[i].material.opacity = this.o;
+                    bigPlanets[i].setOpacity(this.o);
                 }
             })
             .easing(TWEEN.Easing.Quadratic.InOut)
