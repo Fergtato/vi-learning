@@ -11,10 +11,9 @@ io.on('connect', function() {
 
     var game_connected = function() {
         var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
-        // document.body.innerHTML += url;
         console.log(url);
-        var qr_code = new QRCode("qr");
-        qr_code.makeCode(url);
+        // var qr_code = new QRCode("qr");
+        // qr_code.makeCode(url);
         io.removeListener('game_connected', game_connected);
     };
 
