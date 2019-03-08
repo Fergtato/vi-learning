@@ -10,7 +10,8 @@ io.on('connect', function() {
     document.body.appendChild(qr);
 
     var game_connected = function() {
-        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        var url = "https://192.168.1.11:8080/controller.html?id=" + io.id;
         console.log(url);
         var qr_code = new QRCode("qr");
         qr_code.makeCode(url);
@@ -66,6 +67,8 @@ io.on('connect', function() {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        renderer.vr.enabled = true;
+
         var loader = new THREE.TextureLoader();
 
         class Sun {
@@ -111,7 +114,7 @@ io.on('connect', function() {
                     this.ringsPivot = new THREE.Object3D();
                     this.mesh.add( this.ringsPivot );
                     this.ringsGeometry = new THREE.CircleGeometry( 9, 32 );
-                    this.ringsTexture = loader.load( 'saturn_ring_alpha.png' );
+                    this.ringsTexture = loader.load( 'images/saturn_ring_alpha.png' );
                     this.ringsMaterial = new THREE.MeshLambertMaterial( { map: this.ringsTexture,
                     side: THREE.DoubleSide } );
                     this.ringsMaterial.transparent = true;
@@ -201,65 +204,65 @@ io.on('connect', function() {
         };
 
         // SUN
-        sun = new Sun("sun", 10, 32, 32, loader, 'sun.jpg', 0);
+        sun = new Sun("sun", 10, 32, 32, loader, 'images/sun.jpg', 0);
         sun.addToScene();
 
         // MERCURY
-        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'mercury.jpg', 20, false, 0.0047);
+        planets[0] = new Planet("mercury", 2, 32, 32, loader, 'images/mercury.jpg', 20, false, 0.0047);
         planets[0].addToPivot(sun);
 
         // VENUS
-        planets[1] = new Planet("venus", 2, 32, 32, loader, 'venus.jpg', 30, false, 0.0035);
+        planets[1] = new Planet("venus", 2, 32, 32, loader, 'images/venus.jpg', 30, false, 0.0035);
         planets[1].addToPivot(sun);
 
         // EARTH
-        planets[2] = new Planet("earth", 3, 64, 64, loader, 'earth.jpg', 40, false, 0.0029);
+        planets[2] = new Planet("earth", 3, 64, 64, loader, 'images/earth.jpg', 40, false, 0.0029);
         planets[2].addToPivot(sun);
 
         // MOON
-        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'moon.jpg', 5, false, 0.01);
+        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'images/moon.jpg', 5, false, 0.01);
         planets[3].addToPivot(planets[2]);
 
         // MARS
-        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'mars.jpg', 50, false, 0.0024);
+        planets[4] = new Planet("mars", 1.5, 32, 32, loader, 'images/mars.jpg', 50, false, 0.0024);
         planets[4].addToPivot(sun);
 
         // JUPITER
-        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'jupiter.jpg', 60, false, 0.002);
+        planets[5] = new Planet("jupiter", 5, 32, 32, loader, 'images/jupiter.jpg', 60, false, 0.002);
         planets[5].addToPivot(sun);
 
         // SATURN
-        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'saturn.jpg', 70, true, 0.0014);
+        planets[6] = new Planet("saturn", 4, 32, 32, loader, 'images/saturn.jpg', 70, true, 0.0014);
         planets[6].addToPivot(sun);
 
         // URANUS
-        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'uranus.jpg', 80, false, 0.0022);
+        planets[7] = new Planet("uranus", 3, 32, 32, loader, 'images/uranus.jpg', 80, false, 0.0022);
         planets[7].addToPivot(sun);
 
         // NEPTUNE
-        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'neptune.jpg', 90, false, 0.001);
+        planets[8] = new Planet("neptune", 3, 32, 32, loader, 'images/neptune.jpg', 90, false, 0.001);
         planets[8].addToPivot(sun);
 
         // PLUTO
-        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'pluto.jpg', 100, false, 0.0013);
+        planets[9] = new Planet("pluto", 1, 32, 32, loader, 'images/pluto.jpg', 100, false, 0.0013);
         planets[9].addToPivot(sun);
 
 
 
         //Highres Mercury
-        bigPlanets[0] = new BigPlanet("mercury2", 20, 64, 64, loader, 'mercury.jpg', 'earth_clouds.png');
+        bigPlanets[0] = new BigPlanet("mercury2", 20, 64, 64, loader, 'images/mercury.jpg', 'images/earth_clouds.png');
         bigPlanets[0].addToScene();
 
         //Highres Earth
-        bigPlanets[1] = new BigPlanet("earth2", 20, 64, 64, loader, 'earth.jpg', 'earth_clouds.png');
+        bigPlanets[1] = new BigPlanet("earth2", 20, 64, 64, loader, 'images/earth.jpg', 'images/earth_clouds.png');
         bigPlanets[1].addToScene();
 
         //Highres Mars
-        bigPlanets[2] = new BigPlanet("mars2", 20, 64, 64, loader, 'mars.jpg', 'earth_clouds.png');
+        bigPlanets[2] = new BigPlanet("mars2", 20, 64, 64, loader, 'images/mars.jpg', 'images/earth_clouds.png');
         bigPlanets[2].addToScene();
 
 
-        loader.load('stars_milky_way.jpg', function(texture) {
+        loader.load('images/stars_milky_way.jpg', function(texture) {
             var sphereGeometry = new THREE.SphereGeometry(500, 60, 40)
             var sphereMaterial = new THREE.MeshBasicMaterial({
                 map: texture,
@@ -280,6 +283,7 @@ io.on('connect', function() {
 
         document.addEventListener('keydown', Keyboard, false);
 
+        document.body.appendChild(WEBVR.createButton(renderer));
 
     }
 
@@ -445,6 +449,7 @@ io.on('connect', function() {
     }
 
     function animate() {
+        renderer.setAnimationLoop(render);
         requestAnimationFrame(animate);
         render();
     }
