@@ -12,8 +12,8 @@ io.on('connect', function() {
     var qr = document.getElementById('qr');
 
     var game_connected = function() {
-        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
-        // var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
+        // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
         console.log(url);
         var qr_code = new QRCode("qr");
         qr_code.makeCode(url);
@@ -160,6 +160,7 @@ io.on('connect', function() {
         class BigPlanet {
             constructor(name, radius, widthSegments, heightSegments, loader, textureImg, cloudTexture) {
                 this.name = name;
+                this.radius = radius;
                 this.geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
                 this.texture = loader.load( textureImg );
                 // this.material = new THREE.MeshBasicMaterial( { map: this.texture } );
@@ -179,7 +180,7 @@ io.on('connect', function() {
                 this.cloudMesh.visible = false;
 
                 this.bigPlanetLight = new THREE.PointLight( 0xffffff, 0, 200 );
-                this.bigPlanetLight.position.set( 50, 20, 0 );
+                this.bigPlanetLight.position.set( this.radius*2, 20, 0 );
                 this.bigPlanetLight.visible = false;
             }
 
@@ -254,31 +255,31 @@ io.on('connect', function() {
 
 
         //Highres Planets
-        bigPlanets[0] = new BigPlanet("mercury2", 20, 64, 64, loader, 'images/mercury.jpg', 'images/earth_clouds.png');
+        bigPlanets[0] = new BigPlanet("mercury2", 10, 64, 64, loader, 'images/mercury.jpg', 'images/earth_clouds.png');
         bigPlanets[0].addToScene();
 
-        bigPlanets[1] = new BigPlanet("venus2", 20, 64, 64, loader, 'images/venus.jpg', 'images/earth_clouds.png');
+        bigPlanets[1] = new BigPlanet("venus2", 13, 64, 64, loader, 'images/venus.jpg', 'images/earth_clouds.png');
         bigPlanets[1].addToScene();
 
         bigPlanets[2] = new BigPlanet("earth2", 20, 64, 64, loader, 'images/earth.jpg', 'images/earth_clouds.png');
         bigPlanets[2].addToScene();
 
-        bigPlanets[3] = new BigPlanet("mars2", 20, 64, 64, loader, 'images/mars.jpg', 'images/earth_clouds.png');
+        bigPlanets[3] = new BigPlanet("mars2", 15, 64, 64, loader, 'images/mars.jpg', 'images/earth_clouds.png');
         bigPlanets[3].addToScene();
 
-        bigPlanets[4] = new BigPlanet("jupiter2", 20, 64, 64, loader, 'images/jupiter.jpg', 'images/earth_clouds.png');
+        bigPlanets[4] = new BigPlanet("jupiter2", 60, 64, 64, loader, 'images/jupiter.jpg', 'images/earth_clouds.png');
         bigPlanets[4].addToScene();
 
-        bigPlanets[5] = new BigPlanet("saturn2", 20, 64, 64, loader, 'images/saturn.jpg', 'images/earth_clouds.png');
+        bigPlanets[5] = new BigPlanet("saturn2", 40, 64, 64, loader, 'images/saturn.jpg', 'images/earth_clouds.png');
         bigPlanets[5].addToScene();
 
-        bigPlanets[6] = new BigPlanet("uranus2", 20, 64, 64, loader, 'images/uranus.jpg', 'images/earth_clouds.png');
+        bigPlanets[6] = new BigPlanet("uranus2", 25, 64, 64, loader, 'images/uranus.jpg', 'images/earth_clouds.png');
         bigPlanets[6].addToScene();
 
-        bigPlanets[7] = new BigPlanet("neptune2", 20, 64, 64, loader, 'images/neptune.jpg', 'images/earth_clouds.png');
+        bigPlanets[7] = new BigPlanet("neptune2", 30, 64, 64, loader, 'images/neptune.jpg', 'images/earth_clouds.png');
         bigPlanets[7].addToScene();
 
-        bigPlanets[8] = new BigPlanet("pluto2", 20, 64, 64, loader, 'images/pluto.jpg', 'images/earth_clouds.png');
+        bigPlanets[8] = new BigPlanet("pluto2", 5, 64, 64, loader, 'images/pluto.jpg', 'images/earth_clouds.png');
         bigPlanets[8].addToScene();
 
 
@@ -539,7 +540,7 @@ io.on('connect', function() {
 
     io.on('showBigPlanet', function(id) {
         showBigPlanet(id);
-        setCamera(Math.PI/4, Math.PI/2, 40, 2000);
+        setCamera(Math.PI/4, Math.PI/2, bigPlanets[id].radius*2, 2000);
     });
 
 

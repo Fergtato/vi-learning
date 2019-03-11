@@ -19,10 +19,9 @@ let planetNames = [
     "Uranus",
     "Neptune",
     "Pluto"
-]
+];
 
 let planetImages = [];
-
 let planetImageNames = [
     "mercury",
     "venus",
@@ -33,7 +32,7 @@ let planetImageNames = [
     "uranus",
     "neptune",
     "pluto"
-]
+];
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
@@ -58,15 +57,36 @@ function setup() {
     }
 
     rotateImg = loadImage("images/rotate.png");
+
+    sideBarWidth = width/3;
+
+    let gridWidth = width-sideBarWidth;
+    let gridHeight = height;
+    let gridItemWidth = gridWidth/3;
+    let gridItemHeight = height/3;
+
+    let index = 0;
+
+    for (let y = 0; y < gridHeight; y+=gridItemHeight) {
+        for (let x = 0; x < gridWidth; x+=gridItemWidth) {
+
+
+            gridItems[index] = new GridItem(index,x,y,gridItemWidth,gridItemHeight);
+
+            index++;
+        }
+    }
 }
+
 
 function draw() {
 
 
     background(21);
 
-    sideBarWidth = width/3;
     planetGrid();
+
+    sideBar();
 
     if (joystick) {
         joyStick();
@@ -84,11 +104,11 @@ class GridItem {
         this.y = y;
         this.width = width;
         this.height = height;
-        // this.img = loadImage("images/icons/earth.png");
+        this.background = 31;
     }
 
     display() {
-        fill(31);
+        fill(this.background);
         stroke(41);
         rectMode(CENTER);
         rect(this.x+this.width/2, this.y+this.height/2, this.height-50, this.height-50);
@@ -97,36 +117,38 @@ class GridItem {
         fill(255);
         text(planetNames[this.i], this.x+this.width/2, this.y+this.height-40);
         imageMode(CENTER);
-        image(planetImages[this.i], this.x+this.width/2, this.y+this.height/2-10, this.height-90, this.height-90);
+        image(planetImages[this.i], this.x+this.width/2, this.y+this.height/2-10, this.height-100, this.height-100);
     }
 
     clicked() {
+        this.background = 31;
         if (mouseX > this.x && mouseX < this.x+this.width && mouseY > this.y && mouseY < this.y+this.height) {
             console.log(this.i);
             io.emit('gridItemClicked', this.i);
+            this.background = 51;
         }
+    }
+
+    update(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 }
 
 function planetGrid() {
-    let gridWidth = width-sideBarWidth;
-    let gridHeight = height;
-    let gridItemWidth = gridWidth/3;
-    let gridItemHeight = height/3;
 
-    let i = 0;
-
-    for (let y = 0; y < gridHeight; y+=gridItemHeight) {
-        for (let x = 0; x < gridWidth; x+=gridItemWidth) {
-
-
-            gridItems[i] = new GridItem(i,x,y,gridItemWidth,gridItemHeight);
-            gridItems[i].display();
-
-            i++;
-        }
+    for (var i = 0; i < 9; i++) {
+        gridItems[i].display();
     }
 
+}
+
+function sideBar() {
+    rectMode(CORNER);
+    fill(31);
+    rect(width-sideBarWidth, 0, sideBarWidth, height);
 }
 
 function checkOrientation() {
@@ -190,4 +212,21 @@ function windowResized() {
   joystickX = width/2;
   joystickY = height/2;
   // canvas.position(windowWidth/4, windowHeight/4);
+
+  let gridWidth = width-sideBarWidth;
+  let gridHeight = height;
+  let gridItemWidth = gridWidth/3;
+  let gridItemHeight = height/3;
+
+  let index = 0;
+
+  for (let y = 0; y < gridHeight; y+=gridItemHeight) {
+      for (let x = 0; x < gridWidth; x+=gridItemWidth) {
+
+
+          gridItems[index].update(x,y,gridItemWidth,gridItemHeight);
+
+          index++;
+      }
+  }
 }
