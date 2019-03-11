@@ -5,13 +5,15 @@ io.on('connect', function() {
 
     io.emit('game_connect');
 
-    var qr = document.createElement('div');
-    qr.id = "qr";
-    document.body.appendChild(qr);
+    // var qr = document.createElement('div');
+    // qr.id = "qr";
+    // document.body.appendChild(qr);
+
+    var qr = document.getElementById('qr');
 
     var game_connected = function() {
         // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
-        var url = "https://192.168.1.11:8080/controller.html?id=" + io.id;
+        var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
         console.log(url);
         var qr_code = new QRCode("qr");
         qr_code.makeCode(url);
@@ -67,7 +69,9 @@ io.on('connect', function() {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        renderer.vr.enabled = true;
+        // VR
+        // renderer.vr.enabled = true;
+        //
 
         var loader = new THREE.TextureLoader();
 
@@ -249,17 +253,33 @@ io.on('connect', function() {
 
 
 
-        //Highres Mercury
+        //Highres Planets
         bigPlanets[0] = new BigPlanet("mercury2", 20, 64, 64, loader, 'images/mercury.jpg', 'images/earth_clouds.png');
         bigPlanets[0].addToScene();
 
-        //Highres Earth
-        bigPlanets[1] = new BigPlanet("earth2", 20, 64, 64, loader, 'images/earth.jpg', 'images/earth_clouds.png');
+        bigPlanets[1] = new BigPlanet("venus2", 20, 64, 64, loader, 'images/venus.jpg', 'images/earth_clouds.png');
         bigPlanets[1].addToScene();
 
-        //Highres Mars
-        bigPlanets[2] = new BigPlanet("mars2", 20, 64, 64, loader, 'images/mars.jpg', 'images/earth_clouds.png');
+        bigPlanets[2] = new BigPlanet("earth2", 20, 64, 64, loader, 'images/earth.jpg', 'images/earth_clouds.png');
         bigPlanets[2].addToScene();
+
+        bigPlanets[3] = new BigPlanet("mars2", 20, 64, 64, loader, 'images/mars.jpg', 'images/earth_clouds.png');
+        bigPlanets[3].addToScene();
+
+        bigPlanets[4] = new BigPlanet("jupiter2", 20, 64, 64, loader, 'images/jupiter.jpg', 'images/earth_clouds.png');
+        bigPlanets[4].addToScene();
+
+        bigPlanets[5] = new BigPlanet("saturn2", 20, 64, 64, loader, 'images/saturn.jpg', 'images/earth_clouds.png');
+        bigPlanets[5].addToScene();
+
+        bigPlanets[6] = new BigPlanet("uranus2", 20, 64, 64, loader, 'images/uranus.jpg', 'images/earth_clouds.png');
+        bigPlanets[6].addToScene();
+
+        bigPlanets[7] = new BigPlanet("neptune2", 20, 64, 64, loader, 'images/neptune.jpg', 'images/earth_clouds.png');
+        bigPlanets[7].addToScene();
+
+        bigPlanets[8] = new BigPlanet("pluto2", 20, 64, 64, loader, 'images/pluto.jpg', 'images/earth_clouds.png');
+        bigPlanets[8].addToScene();
 
 
         loader.load('images/stars_milky_way.jpg', function(texture) {
@@ -283,8 +303,9 @@ io.on('connect', function() {
 
         document.addEventListener('keydown', Keyboard, false);
 
-        document.body.appendChild(WEBVR.createButton(renderer));
-
+        // VR
+        // document.body.appendChild(WEBVR.createButton(renderer));
+        //
     }
 
     function Keyboard() {
@@ -320,7 +341,7 @@ io.on('connect', function() {
 
         //Key: 2
         if(event.keyCode == 50) {
-            showBigPlanet(1);
+            showBigPlanet(6);
         }
 
         if(event.keyCode == 90) {
@@ -371,6 +392,7 @@ io.on('connect', function() {
     }
 
     function showBigPlanet(planet) {
+        var infoBox = document.getElementById("info" + planet);
         //fade solarsystem to hidden
         var opacityFrom = { o: 1 };
         var opacityTween = new TWEEN.Tween(opacityFrom)
@@ -381,6 +403,7 @@ io.on('connect', function() {
                 }
                 for (var i = 0; i < bigPlanets.length; i++) {
                     bigPlanets[i].setOpacity(this.o);
+                    document.getElementById("info" + i).style.opacity = this.o;
                 }
                 sun.material.opacity = this.o;
             })
@@ -393,11 +416,17 @@ io.on('connect', function() {
                 sun.mesh.visible = false;
                 for (var i = 0; i < bigPlanets.length; i++) {
                     bigPlanets[i].visible(false);
+                    document.getElementById("info" + i).style.display = "none";
                 }
                 //set big planet visiblity to true
                 bigPlanets[planet].visible(true);
+                infoBox.style.display = "block";
             })
             .start();
+
+        // for (var i = 0; i < 9; i++) {
+        //     document.getElementById("info" + i).style.display = "none";
+        // }
 
         //fade chosen big planet to visible
         var from = { o: bigPlanets[planet].material.opacity };
@@ -406,9 +435,12 @@ io.on('connect', function() {
             .delay(1000)
             .onUpdate(function() {
                 bigPlanets[planet].setOpacity(this.o);
+                infoBox.style.opacity = this.o;
             })
             .easing(TWEEN.Easing.Quadratic.InOut)
             .start();
+
+
     }
 
     function showSolarSytem() {
@@ -449,7 +481,10 @@ io.on('connect', function() {
     }
 
     function animate() {
-        renderer.setAnimationLoop(render);
+        // VR
+        // renderer.setAnimationLoop(render);
+        //
+
         requestAnimationFrame(animate);
         render();
     }
@@ -488,9 +523,9 @@ io.on('connect', function() {
 
     io.on('controller_connected', function(connected) {
         if (connected) {
-            document.getElementById("qr").style.display = "none";
+            document.getElementById("qrContainer").style.display = "none";
         } else {
-            document.getElementById("qr").style.display = "block";
+            document.getElementById("qrContainer").style.display = "block";
         }
     });
 
@@ -500,6 +535,11 @@ io.on('connect', function() {
 
     io.on('yRotating', function(yRotation) {
         controls.rotateY((Math.PI/50)*yRotation);
+    });
+
+    io.on('showBigPlanet', function(id) {
+        showBigPlanet(id);
+        setCamera(Math.PI/4, Math.PI/2, 40, 2000);
     });
 
 

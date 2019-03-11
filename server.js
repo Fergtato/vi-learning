@@ -95,4 +95,8 @@ io.sockets.on('connection', function(socket) {
         socket.broadcast.emit("yRotating", yRotation);
     });
 
+    socket.on('gridItemClicked', function(id) {
+        socket.broadcast.emit("showBigPlanet", id);
+    });
+
 });

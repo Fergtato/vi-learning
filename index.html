@@ -11,18 +11,73 @@
     <script src="//threejs.org/build/three.min.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+
     <!--     <script src="sketch.js" type="text/javascript"></script> -->
 
     <style>
         body {
+            position: relative;
+            /* float: left;
+            width: 100%; */
             margin: 0;
+            overflow: hidden;
+        }
+
+        #qrContainer {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            /* height: 100%;
+            width: 100vw; */
+            /* top:0;
+            left:0; */
+            padding: 20px;
+            background-color: rgba(0,0,0,0.7);
+
+            /* display: none; */
+        }
+
+        .qrModal {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            display: inline-block;
+            background-color: #212121;
+            padding: 40px;
+            color: white;
+            text-align: center;
+            border: 2px solid #313131;
+            border-radius: 10px;
         }
 
         #qr {
-            position: absolute;
-            top: 0;
+            /* position: relative; */
+            display: inline-block;
             padding: 20px;
             background: white;
+            margin-top: 100px;
+        }
+
+        .planetInfoModal {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background-color: #212121;
+            padding: 40px;
+            border: 2px solid #313131;
+            text-align: center;
+            color: white;
+            display: none;
+            opacity: 0;
+
+            -webkit-box-shadow: inset 0px 0px 38px -9px rgba(0,0,0,0.75);
+            -moz-box-shadow: inset 0px 0px 38px -9px rgba(0,0,0,0.75);
+            box-shadow: inset 0px 0px 38px -9px rgba(0,0,0,0.75);
         }
 
         canvas {
@@ -32,6 +87,147 @@
 </head>
 
 <body>
+
+    <div class="planetInfoModal" id="info0">
+        <h1>Mercury</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info1">
+        <h1>Venus</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info2">
+        <h1>Earth</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info3">
+        <h1>Mars</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info4">
+        <h1>Jupiter</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info5">
+        <h1>Saturn</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info6">
+        <h1>Uranus</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info7">
+        <h1>Neptune</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+    <div class="planetInfoModal" id="info8">
+        <h1>Pluto</h1>
+        <p>Mercury is the innermost and smallest planet of the Solar System. Because it has almost no atmosphere to retain heat, Mercury’s surface experiences the greatest temperature variation of all the planets.</p>
+        <h3>Observation</h3>
+        <p>Mercury appears as a morning or evening star from Earth, but due to it’s proximity to Sun, it is very hard to see. Still, Mercury can be observed at least twice a year: in spring at dusk and in autumn before dawn.</p>
+        <h3>Structure</h3>
+        <table border="1">
+            <tr><th>Layer</th><th>Composition</th></tr>
+            <tr><td>Crust</td><td>Surface of silicate rock</td></tr>
+            <tr><td>Mantle</td><td>Solid silicate rock</td></tr>
+            <tr><td>Core</td><td>Molten iron</td></tr>
+        </table>
+    </div>
+
+
+
+    <div id="qrContainer">
+        <div class="qrModal">
+
+
+            <h1>Scan the QR code with a tablet device</h1>
+            <div id="qr">
+
+            </div>
+
+        </div>
+    </div>
+
 </body>
 
 <script src="solarsystem.js"></script>
