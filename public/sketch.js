@@ -6,8 +6,11 @@ let joystick = false;
 let joystickX, joystickY;
 let sideBarWidth;
 let rotateImg;
+let planetInfoID = 0;
+let planetInfoShow = false;
 
 let gridItems = [];
+let options = [];
 
 let planetNames = [
     "Mercury",
@@ -33,6 +36,8 @@ let planetImageNames = [
     "neptune",
     "pluto"
 ];
+
+showOrbitTracks = true;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
@@ -69,10 +74,7 @@ function setup() {
 
     for (let y = 0; y < gridHeight; y+=gridItemHeight) {
         for (let x = 0; x < gridWidth; x+=gridItemWidth) {
-
-
             gridItems[index] = new GridItem(index,x,y,gridItemWidth,gridItemHeight);
-
             index++;
         }
     }
@@ -84,6 +86,10 @@ function draw() {
     background(21);
 
     planetGrid();
+
+    if (planetInfoShow) {
+        planetInfo();
+    }
 
     sideBar();
 
@@ -125,6 +131,8 @@ class GridItem {
             console.log(this.i);
             io.emit('gridItemClicked', this.i);
             this.background = 51;
+            planetInfoShow = true;
+            planetInfoID = this.i;
         }
     }
 
@@ -136,6 +144,34 @@ class GridItem {
     }
 }
 
+class Option {
+    constructor(i, text, condition, call) {
+        this.i = i;
+        this.text = text;
+        this.condition = condition;
+        this.call = call;
+    }
+
+    display() {
+        fill(41);
+        stroke(51);
+        rectMode(CORNER);
+        rect(width-sideBarWidth + 20,80+(this.i*70),sideBarWidth-40,50);
+
+        textAlign(CENTER, CENTER);
+        fill(255);
+        noStroke();
+        textSize(18);
+        text(this.text + " - " + this.condition, width-(sideBarWidth/2), 80+(this.i*70)+25);
+    }
+
+    clicked() {
+        if (mouseX > width-sideBarWidth + 20 && mouseX < width-20 && mouseY > 80+(this.i*70) && mouseY < 80+(this.i*70)+50) {
+            this.call();
+        }
+    }
+}
+
 function planetGrid() {
 
     for (let i = 0; i < 9; i++) {
@@ -144,13 +180,57 @@ function planetGrid() {
 
 }
 
+function planetInfo() {
+    rectMode(CORNER);
+    fill(35);
+    rect(0,0,width-sideBarWidth,height);
+
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(35);
+    text(planetNames[planetInfoID], (width-sideBarWidth)/2, 100);
+
+    image(planetImages[planetInfoID], (width-sideBarWidth)/2, height/2, width/3.5,width/3.5);
+
+    rectMode(CENTER);
+    fill(41);
+    stroke(51);
+    rect((width-sideBarWidth)/2, height-100, 400, 80);
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(22);
+    text("SHOW UNIVERSE", (width-sideBarWidth)/2, height-100);
+}
+
 function sideBar() {
     rectMode(CORNER);
     fill(31);
     rect(width-sideBarWidth, 0, sideBarWidth, height);
 
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(14);
+    text("Options", width-(sideBarWidth/2), 40);
+
+    options[0] = new Option(0, "Orbit Rings", showOrbitTracks, function() {
+        showOrbitTracks = !showOrbitTracks;
+        io.emit('toggleOption', showOrbitTracks);
+        console.log("OrbitRings: " + showOrbitTracks);
+    });
+    options[1] = new Option(1, "Toggle Thing", false, function() {
+        console.log("option1");
+    });
+    options[2] = new Option(2, "Toggle Thing", false, function() {
+        console.log("option2");
+    });
+
+    for (var i = 0; i < options.length; i++) {
+        options[i].display();
+    }
+
     let joystickButtonHeight = height/6;
     fill(41);
+    stroke(51);
     rect(width-sideBarWidth + 20, height - joystickButtonHeight, sideBarWidth-40, joystickButtonHeight-20);
     textAlign(CENTER, CENTER);
     fill(255);
@@ -199,12 +279,27 @@ function touchStarted() {
         }
 
     } else {
-        for (let i = 0; i < gridItems.length; i++) {
-            gridItems[i].clicked();
+        if (!planetInfoShow) {
+            for (let i = 0; i < gridItems.length; i++) {
+                gridItems[i].clicked();
+            }
+        } else {
+            if (mouseX > ((width-sideBarWidth)/2)-200 && mouseX < ((width-sideBarWidth)/2)+200 && mouseY > (height-100)-40 && mouseY < (height-100)+40) {
+                planetInfoShow = false;
+                io.emit('closePlanetInfo');
+                for (let i = 0; i < gridItems.length; i++) {
+                }
+            }
+
+            rect((width-sideBarWidth)/2, height-100, 400, 80);
         }
 
         if (mouseX > width-sideBarWidth+20 && mouseX < width-20 && mouseY > height-height/6 && mouseY < height-20) {
             joystick = true;
+        }
+
+        for (let i = 0; i < options.length; i++) {
+            options[i].clicked();
         }
     }
 

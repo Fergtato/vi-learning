@@ -12,8 +12,8 @@ io.on('connect', function() {
     var qr = document.getElementById('qr');
 
     var game_connected = function() {
-        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
-        // var url = "http://192.168.1.15:8080/controller.html?id=" + io.id;
+        // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        var url = "http://192.168.1.15:8080/controller.html?id=" + io.id;
         console.log(url);
         var qr_code = new QRCode("qr");
         qr_code.makeCode(url);
@@ -48,6 +48,8 @@ io.on('connect', function() {
     var zoomDistance = 40;
 
     var zoomTween;
+
+    showOrbitTracks = true;
     // var spin = 0;
     // var yRotationValue = 0;
     // const axis = new THREE.Vector3(0, 1, 0).normalize();
@@ -73,6 +75,29 @@ io.on('connect', function() {
         // renderer.vr.enabled = true;
         //
 
+
+
+
+        // create an AudioListener and add it to the camera
+        var listener = new THREE.AudioListener();
+        camera.add( listener );
+
+        // create a global audio source
+        var sound = new THREE.Audio( listener );
+
+        // load a sound and set it as the Audio object's buffer
+        var audioLoader = new THREE.AudioLoader();
+        audioLoader.load( 'sounds/spaceoddity.mp3', function( buffer ) {
+        	sound.setBuffer( buffer );
+        	sound.setLoop( true );
+        	sound.setVolume( 0.5 );
+        	// sound.play();
+        })
+
+
+
+
+
         var loader = new THREE.TextureLoader();
 
         class Sun {
@@ -91,7 +116,7 @@ io.on('connect', function() {
             addToScene() {
                 scene.add(this.mesh);
             }
-        };
+        }
 
         class Planet {
             constructor(name, radius, widthSegments, heightSegments, loader, textureImg, distance, showRings, pivotSpeed) {
@@ -104,7 +129,7 @@ io.on('connect', function() {
                 this.mesh = new THREE.Mesh(this.geometry, this.material);
                 this.mesh.position.x = distance;
                 this.pivot = new THREE.Object3D();
-                this.spinSpeed = -0.01;
+                this.spinSpeed = -0.1;
                 this.pivotSpeed = pivotSpeed;
 
                 this.trackMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -144,7 +169,9 @@ io.on('connect', function() {
 
             setOpacity(opacity) {
                 this.material.opacity = opacity;
-                this.trackMaterial.opacity = opacity;
+                if (showOrbitTracks) {
+                    this.trackMaterial.opacity = opacity;
+                }
                 if (this.showRings) {
                     this.ringsMaterial.opacity = opacity;
                 }
@@ -152,10 +179,13 @@ io.on('connect', function() {
 
             visible(boolean) {
                 this.mesh.visible = boolean;
-                this.trackMesh.visible = boolean;
+                if (showOrbitTracks) {
+                    this.trackMesh.visible = boolean;
+                }
+
             }
 
-        };
+        }
 
         class BigPlanet {
             constructor(name, radius, widthSegments, heightSegments, loader, textureImg, cloudTexture) {
@@ -222,7 +252,7 @@ io.on('connect', function() {
                 this.cloudMesh.visible = boolean;
                 this.bigPlanetLight.visible = boolean;
             }
-        };
+        }
 
         // SUN
         sun = new Sun("sun", 10, 32, 32, loader, 'images/sun.jpg', 0);
@@ -241,7 +271,7 @@ io.on('connect', function() {
         planets[2].addToPivot(sun);
 
         // MOON
-        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'images/moon.jpg', 5, false, 0.01);
+        planets[3] = new Planet("moon", 0.7, 32, 32, loader, 'images/moon.jpg', 5, false, 0.3);
         planets[3].addToPivot(planets[2]);
 
         // MARS
@@ -335,7 +365,7 @@ io.on('connect', function() {
 
         //Test Key: "U"
         if(event.keyCode == 85) {
-            setCamera(Math.PI/2, 0, 150, 2000);
+
         }
 
         //Key: F
@@ -348,7 +378,9 @@ io.on('connect', function() {
 
         //Key: H
         if(event.keyCode == 72) {
+
             showSolarSytem();
+            setCamera(Math.PI/2, 0, 150, 2000);
         }
 
         //Key: 1
@@ -469,12 +501,14 @@ io.on('connect', function() {
             .onUpdate(function() {
                 for (var i = 0; i < bigPlanets.length; i++) {
                     bigPlanets[i].setOpacity(this.o);
+                    document.getElementById("info" + i).style.opacity = this.o;
                 }
             })
             .easing(TWEEN.Easing.Quadratic.InOut)
             .onComplete(function() {
                 for (var i = 0; i < bigPlanets.length; i++) {
                     bigPlanets[i].visible(false);
+                    document.getElementById("info" + i).style.display = "none";
                 }
 
                 for (var i = 0; i < planets.length; i++) {
@@ -535,7 +569,7 @@ io.on('connect', function() {
         controls.update();
 
         renderer.render(scene, camera);
-    };
+    }
 
     io.on('game_connected', game_connected);
 
@@ -560,6 +594,16 @@ io.on('connect', function() {
         setCamera(Math.PI/4, Math.PI/2, bigPlanets[id].radius*2, 2000);
     });
 
+    io.on('showSolarSytem', function() {
+        showSolarSytem();
+        setCamera(Math.PI/2, 0, 150, 2000);
+    });
 
+    io.on('optionToggled', function(boolean) {
+        showOrbitTracks = boolean;
+        for (var i = 0; i < planets.length; i++) {
+            planets[i].trackMesh.visible = showOrbitTracks;
+        }
+    });
 
 });

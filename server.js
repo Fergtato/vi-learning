@@ -99,4 +99,12 @@ io.sockets.on('connection', function(socket) {
         socket.broadcast.emit("showBigPlanet", id);
     });
 
+    socket.on('closePlanetInfo', function() {
+        socket.broadcast.emit("showSolarSytem");
+    });
+
+    socket.on('toggleOption', function(boolean) {
+        socket.broadcast.emit("optionToggled", boolean);
+    });
+
 });
