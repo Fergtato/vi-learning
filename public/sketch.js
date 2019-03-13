@@ -52,7 +52,7 @@ function setup() {
         }
     });
 
-    for (var i = 0; i < planetImageNames.length; i++) {
+    for (let i = 0; i < planetImageNames.length; i++) {
         planetImages[i] = loadImage("images/icons/" + planetImageNames[i] + ".png");
     }
 
@@ -112,6 +112,7 @@ class GridItem {
         rect(this.x+this.width/2, this.y+this.height/2, this.height-50, this.height-50);
         fill(0);
         textAlign(CENTER, CENTER);
+        textSize(12);
         fill(255);
         text(planetNames[this.i], this.x+this.width/2, this.y+this.height-40);
         imageMode(CENTER);
@@ -137,7 +138,7 @@ class GridItem {
 
 function planetGrid() {
 
-    for (var i = 0; i < 9; i++) {
+    for (let i = 0; i < 9; i++) {
         gridItems[i].display();
     }
 
@@ -147,6 +148,14 @@ function sideBar() {
     rectMode(CORNER);
     fill(31);
     rect(width-sideBarWidth, 0, sideBarWidth, height);
+
+    let joystickButtonHeight = height/6;
+    fill(41);
+    rect(width-sideBarWidth + 20, height - joystickButtonHeight, sideBarWidth-40, joystickButtonHeight-20);
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(22);
+    text("JOYSTICK", width-(sideBarWidth/2), height-joystickButtonHeight/2-10);
 }
 
 function checkOrientation() {
@@ -160,10 +169,18 @@ function checkOrientation() {
 
 function joyStick() {
     rectMode(CORNER);
-    fill(242);
+    fill(31);
     rect(0,0,width, height);
-    fill(221);
-    stroke(186);
+
+    stroke(91);
+    line(width-40,40,width-15,15);
+    line(width-40,15,width-15,40);
+
+    noFill();
+    stroke(51);
+    ellipse(joystickX,joystickY,80,80);
+    fill(61);
+    stroke(51);
     ellipse(joystickX,joystickY,40,40);
 
     if (moving) {
@@ -176,16 +193,27 @@ function joyStick() {
 
 function touchStarted() {
     if (joystick) {
-        moving = true;
+
+        if (!moving && mouseX > width-40 && mouseX < width-15 && mouseY > 15 && mouseY < 40) {
+            joystick = false;
+        }
+
     } else {
-        for (var i = 0; i < gridItems.length; i++) {
+        for (let i = 0; i < gridItems.length; i++) {
             gridItems[i].clicked();
         }
+
+        if (mouseX > width-sideBarWidth+20 && mouseX < width-20 && mouseY > height-height/6 && mouseY < height-20) {
+            joystick = true;
+        }
     }
+
+
 
 }
 
 function touchMoved() {
+    moving = true;
     joystickX = mouseX;
     joystickY = mouseY;
 }
@@ -210,6 +238,8 @@ function windowResized() {
   joystickX = width/2;
   joystickY = height/2;
   // canvas.position(windowWidth/4, windowHeight/4);
+
+  sideBarWidth = width/3;
 
   let gridWidth = width-sideBarWidth;
   let gridHeight = height;
