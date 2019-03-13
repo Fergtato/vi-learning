@@ -12,8 +12,8 @@ io.on('connect', function() {
     var qr = document.getElementById('qr');
 
     var game_connected = function() {
-        // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
-        var url = "http://192.168.1.15:8080/controller.html?id=" + io.id;
+        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        // var url = "http://192.168.1.15:8080/controller.html?id=" + io.id;
         console.log(url);
         var qr_code = new QRCode("qr");
         qr_code.makeCode(url);
