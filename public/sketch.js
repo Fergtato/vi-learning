@@ -81,7 +81,6 @@ function setup() {
 
 function draw() {
 
-
     background(21);
 
     planetGrid();
@@ -91,7 +90,6 @@ function draw() {
     if (joystick) {
         joyStick();
     }
-
 
     checkOrientation();
 

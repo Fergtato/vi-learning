@@ -182,6 +182,19 @@ io.on('connect', function() {
                 this.bigPlanetLight = new THREE.PointLight( 0xffffff, 0, 200 );
                 this.bigPlanetLight.position.set( this.radius*2, 20, 0 );
                 this.bigPlanetLight.visible = false;
+
+                if (this.name == "saturn2") {
+                    this.ringsPivot = new THREE.Object3D();
+                    this.mesh.add( this.ringsPivot );
+                    this.ringsGeometry = new THREE.CircleGeometry( this.radius*2, 128 );
+                    this.ringsTexture = loader.load( 'images/saturn_ring_alpha.png' );
+                    this.ringsMaterial = new THREE.MeshLambertMaterial( { map: this.ringsTexture,
+                    side: THREE.DoubleSide } );
+                    this.ringsMaterial.transparent = true;
+                    this.rings = new THREE.Mesh( this.ringsGeometry, this.ringsMaterial );
+                    this.rings.rotation.x = 5;
+                    this.ringsPivot.add( this.rings );
+                }
             }
 
             addToScene() {
@@ -199,6 +212,9 @@ io.on('connect', function() {
                 this.material.opacity = opacity;
                 this.cloudMaterial.opacity = opacity;
                 this.bigPlanetLight.intensity = opacity;
+                if (this.name == "saturn2") {
+                    this.ringsMaterial.opacity = opacity;
+                }
             }
 
             visible(boolean) {
@@ -342,7 +358,8 @@ io.on('connect', function() {
 
         //Key: 2
         if(event.keyCode == 50) {
-            showBigPlanet(6);
+            showBigPlanet(5);
+            setCamera(Math.PI/4, Math.PI/2, bigPlanets[5].radius*2, 2000);
         }
 
         if(event.keyCode == 90) {
