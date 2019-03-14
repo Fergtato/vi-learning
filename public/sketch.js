@@ -1,9 +1,12 @@
 var io;
 let xRotation;
 let yRotation;
+let zoomAmount;
 let moving = false;
+let zooming = false;
 let joystick = false;
 let joystickX, joystickY;
+let zoomY;
 let sideBarWidth;
 let rotateImg;
 let planetInfoID = 0;
@@ -44,6 +47,7 @@ function setup() {
 
     joystickX = width/2;
     joystickY = height/2;
+    zoomY = height/2;
 
     io = io.connect();
 
@@ -145,10 +149,9 @@ class GridItem {
 }
 
 class Option {
-    constructor(i, text, condition, call) {
+    constructor(i, text, call) {
         this.i = i;
         this.text = text;
-        this.condition = condition;
         this.call = call;
     }
 
@@ -162,7 +165,7 @@ class Option {
         fill(255);
         noStroke();
         textSize(18);
-        text(this.text + " - " + this.condition, width-(sideBarWidth/2), 80+(this.i*70)+25);
+        text(this.text, width-(sideBarWidth/2), 80+(this.i*70)+25);
     }
 
     clicked() {
@@ -212,15 +215,15 @@ function sideBar() {
     textSize(14);
     text("Options", width-(sideBarWidth/2), 40);
 
-    options[0] = new Option(0, "Orbit Rings", showOrbitTracks, function() {
+    options[0] = new Option(0, "Orbit Rings - " + showOrbitTracks, function() {
         showOrbitTracks = !showOrbitTracks;
-        io.emit('toggleOption', showOrbitTracks);
+        io.emit('toggleOrbitTracks', showOrbitTracks);
         console.log("OrbitRings: " + showOrbitTracks);
     });
-    options[1] = new Option(1, "Toggle Thing", false, function() {
+    options[1] = new Option(1, "Toggle Thing", function() {
         console.log("option1");
     });
-    options[2] = new Option(2, "Toggle Thing", false, function() {
+    options[2] = new Option(2, "Toggle Thing", function() {
         console.log("option2");
     });
 
@@ -256,6 +259,13 @@ function joyStick() {
     line(width-40,40,width-15,15);
     line(width-40,15,width-15,40);
 
+    fill(51);
+    rect(20, 20, 40, height-40);
+    rectMode(CENTER);
+    fill(41);
+    let limitedZoomy = constrain(zoomY, 40, height-40);
+    rect(40, limitedZoomy, 40, 40);
+
     noFill();
     stroke(51);
     ellipse(joystickX,joystickY,80,80);
@@ -268,6 +278,13 @@ function joyStick() {
         yRotation = (height/2 - mouseY);
         io.emit('xRotate', map(xRotation, 0, width/2, 0, 0.1));
         io.emit('yRotate', map(yRotation, 0, width/2, 0, 0.1));
+    } else if (zooming) {
+        let zoomAmount = dist(0, height/2, 0, mouseY);
+        if (mouseY < height/2) {
+            io.emit('zoom', zoomAmount);
+        } else {
+            io.emit('zoom', -zoomAmount);
+        }
     }
 }
 
@@ -308,20 +325,32 @@ function touchStarted() {
 }
 
 function touchMoved() {
-    moving = true;
-    joystickX = mouseX;
-    joystickY = mouseY;
+    if (mouseX > 100) {
+        zooming = false;
+        moving = true;
+        joystickX = mouseX;
+        joystickY = mouseY;
+    } else {
+        moving = false;
+        zooming = true;
+        zoomY = mouseY;
+    }
+
 }
 
 function touchEnded() {
     moving = false;
     joystickX = width/2;
     joystickY = height/2;
+    zooming = false;
+    zoomY = height/2;
 
     xRotation = 0;
     io.emit('xRotate', xRotation);
     yRotation = 0;
     io.emit('yRotate', yRotation);
+    zoomAmount = 0;
+    io.emit('zoom', zoomAmount);
 }
 
 function deviceMoved() {

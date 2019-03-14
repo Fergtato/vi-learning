@@ -570,6 +570,10 @@ io.on('connect', function() {
     io.on('yRotating', function(yRotation) {
         controls.rotateY((Math.PI/50)*yRotation);
     });
+    io.on('zooming', function(zoomAmount) {
+        controls.stepIn(-zoomAmount/200);
+        console.log(zoomAmount);
+    });
 
     io.on('showBigPlanet', function(id) {
         showBigPlanet(id);
@@ -580,7 +584,7 @@ io.on('connect', function() {
         setCamera(Math.PI/2, 0, 150, 2000);
     });
 
-    io.on('optionToggled', function(boolean) {
+    io.on('orbitTracksToggled', function(boolean) {
         showOrbitTracks = boolean;
         for (var i = 0; i < planets.length; i++) {
             planets[i].trackMesh.visible = showOrbitTracks;

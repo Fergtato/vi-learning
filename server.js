@@ -95,6 +95,10 @@ io.sockets.on('connection', function(socket) {
         socket.broadcast.emit("yRotating", yRotation);
     });
 
+    socket.on('zoom', function(zoomAmount) {
+        socket.broadcast.emit("zooming", zoomAmount);
+    });
+
     socket.on('gridItemClicked', function(id) {
         socket.broadcast.emit("showBigPlanet", id);
     });
@@ -103,8 +107,8 @@ io.sockets.on('connection', function(socket) {
         socket.broadcast.emit("showSolarSytem");
     });
 
-    socket.on('toggleOption', function(boolean) {
-        socket.broadcast.emit("optionToggled", boolean);
+    socket.on('toggleOrbitTracks', function(boolean) {
+        socket.broadcast.emit("orbitTracksToggled", boolean);
     });
 
 });
