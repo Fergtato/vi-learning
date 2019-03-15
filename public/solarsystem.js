@@ -11,12 +11,12 @@ io.on('connect', function() {
 
     var game_connected = function() {
         // controller url for pushing to Heroku server
-        var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
+        // var url = "https://vi-learning.herokuapp.com/controller.html?id=" + io.id;
 
         // controller url for running on localhost
         // change the IP address your computer's IPv4 address for the controller to work on localhost
         // e.g.  var url = "http://[YOUR LOCAL IP ADDRESS]:8080/controller.html?id=" + io.id;
-        // var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
+        var url = "http://192.168.1.11:8080/controller.html?id=" + io.id;
 
         console.log("Controller: " + url);
         // create QR using generated url

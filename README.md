@@ -1,6 +1,8 @@
 # Visual Interactive Learning
 
-A 3D visual learning app
+A 3D visual learning app created for my 4th Creative Computing Project
+
+[LIVE DEMO](http://vi-learning.herokuapp.com/)
 
 ## Setup
 
