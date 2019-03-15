@@ -1,8 +1,18 @@
 # Visual Interactive Learning
 
-Cool 3D space app B-)
+A 3D visual learning app
 
 ## Setup
+
+Clone the project
+```
+git clone https://github.com/Fergtato/vi-learning.git
+```
+
+Navigate into the folder
+```
+cd vi-learning
+```
 
 Install dependencies
 ```
@@ -16,24 +26,16 @@ var url = "http://[Your IPv4 Address]:8080/controller.html?id=" + io.id;
 
 Start server
 ```
-node server.js
+npm start
 ```
 
 Go to localhost:8080
 
-### Using the app
+### Using the app's controller
 
-Make sure your phone is on the same network as the device running the server.
+Make sure your device is on the same network as the device running the server.
+
+The controller works best on an iPad.
 
 Scan the QR code with your phone and go to the link given.
-(If you're not bothered to scan the code i've logged the link in the javascript console in the browser)
-
-Use the yellow dot as a joystick on your phone to control the camera
-
-### Temporary testing keys
-
-[F] Animates the camera back to starting position
-
-[T] Animates camera to zoom in
-
-[H] Hides the planets
+(The link to the controller is also logged in the javascript console of the browser)
